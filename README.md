@@ -23,8 +23,8 @@ Assurez-vous d'avoir Python 3.9+ installé.
 
 ```bash
 # Cloner le projet
-git clone <votre-url-repo>
-cd scrap-ratio
+git clone https://github.com/sabuontop/api-ratio.git
+cd api-ratio
 
 # Créer et activer l'environnement virtuel
 python -m venv venv
