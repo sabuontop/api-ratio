@@ -1,0 +1,6 @@
+playwright
+python-dotenv
+fastapi
+uvicorn
+apscheduler
+playwright-stealth
