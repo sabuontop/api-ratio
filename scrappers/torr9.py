@@ -5,12 +5,16 @@ from typing import Dict, Any, Optional
 from playwright.async_api import async_playwright, Page
 from dotenv import load_dotenv
 
-from util import default_user_agent
+from util import default_user_agent, load_file, write_file
 
 load_dotenv()
 logger = logging.getLogger()
 
-async def get_torr9_token(page: Page) -> Optional[str]:
+TOKEN_FILE = "torr9_token.txt"
+LOGIN_PAGE_URL = "https://torr9.net/login"
+USER_STATS_URL = "https://api.torr9.net/api/v1/users/me"
+
+async def _get_torr9_token(page: Page) -> Optional[str]:
     """Automated login to get a fresh Torr9 token if missing or expired"""
     user = os.getenv("TORR9_USER") or os.getenv("TOR9_USER")
     psw = os.getenv("TORR9_PASSWORD") or os.getenv("TORR9_PASS") or os.getenv("TOR9_PASS")
@@ -22,7 +26,7 @@ async def get_torr9_token(page: Page) -> Optional[str]:
 
     try:
         logger.info("Torr9: Attempting automated login...")
-        await page.goto("https://torr9.net/login")
+        await page.goto(LOGIN_PAGE_URL)
         await page.fill('input[placeholder*="utilisateur"]', user)
         await page.fill('input[placeholder*="mot de passe"]', psw)
         await asyncio.sleep(1)
@@ -38,8 +42,7 @@ async def get_torr9_token(page: Page) -> Optional[str]:
         for _ in range(10):
             token = await page.evaluate("() => localStorage.getItem('token')")
             if token:
-                with open("torr9_token.txt", "w") as f:
-                    f.write(token)
+                write_file(TOKEN_FILE, token)
                 logger.info("Torr9: New token obtained and saved.")
                 return token
             await asyncio.sleep(1)
@@ -57,27 +60,25 @@ async def get_stats(headless: bool = True) -> Dict[str, Any]:
     try:
         res : Dict[str, Any] = {"ratio": "N/A", "upload": "N/A", "download": "N/A"}
         token = None
-        if os.path.exists("torr9_token.txt"):
-            with open("torr9_token.txt", "r") as f:
-                token = f.read().strip()
-        
-        if not token:
-            token = await get_torr9_token(page)
+        try:
+            token= load_file(TOKEN_FILE).strip()
+        except FileNotFoundError:
+            token = await _get_torr9_token(page)
         
         if not token:
             return {"ratio": "No Token", "upload": "N/A", "download": "N/A"}
         
         response = await context.request.get(
-            "https://api.torr9.net/api/v1/users/me",
+            USER_STATS_URL,
             headers={"Authorization": f"Bearer {token}"}
         )
         
         if response.status == 401:
             logger.warning("Torr9: Token expired, refreshing...")
-            token = await get_torr9_token(page)
+            token = await _get_torr9_token(page)
             if token:
                 response = await context.request.get(
-                    "https://api.torr9.net/api/v1/users/me",
+                    USER_STATS_URL,
                     headers={"Authorization": f"Bearer {token}"}
                 )
         

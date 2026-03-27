@@ -7,8 +7,7 @@ venv/
 
 # Project specific sensitive files
 .env
-torr9_token.txt
-c411_cookies.json
+.config
 *.rar
 
 # IDE

@@ -6,10 +6,14 @@ from typing import Dict, Any
 from playwright.async_api import async_playwright, BrowserContext, Page
 from dotenv import load_dotenv
 
-from util import default_user_agent
+from util import default_user_agent, load_file, write_file
 
 load_dotenv()
 logger = logging.getLogger()
+
+COOKIES_FILE = "c411_cookies.json"
+LOGIN_PAGE_URL = "https://c411.org/login"
+USER_STATS_URL = "https://c411.org/api/auth/me"
 
 async def _get_c411_cookies(ctx: BrowserContext, page: Page) -> bool:
     """Automated login to get fresh C411 cookies if missing or expired"""
@@ -19,7 +23,7 @@ async def _get_c411_cookies(ctx: BrowserContext, page: Page) -> bool:
 
     try:
         logger.info("C411: Attempting automated login...")
-        await page.goto("https://c411.org/login")
+        await page.goto(LOGIN_PAGE_URL)
         await page.fill('input[placeholder*="Pseudo"]', user)
         await page.fill('input[placeholder*="Mot de passe"]', psw)
         await asyncio.sleep(1)
@@ -32,14 +36,13 @@ async def _get_c411_cookies(ctx: BrowserContext, page: Page) -> bool:
         
         await asyncio.sleep(5) 
         
-        await page.goto("https://c411.org/api/auth/me")
+        await page.goto(USER_STATS_URL)
         content = await page.inner_text("body")
         api_data = json.loads(content)
         
         if api_data.get("authenticated"):
             cookies = await ctx.cookies()
-            with open("c411_cookies.json", "w") as f:
-                json.dump(cookies, f)
+            write_file(COOKIES_FILE, json.dumps(cookies))
             logger.info("C411: New cookies obtained and saved.")
             return True
     except Exception as e:
@@ -55,25 +58,21 @@ async def get_stats(headless: bool = True) -> Dict[str, Any]:
         page = await context.new_page()
         try:
             res : Dict[str, Any] = {"ratio": "N/A", "upload": "N/A", "download": "N/A"}
-            
-            cookie_path = "c411_cookies.json"
-            if not os.path.exists(cookie_path):
+            try:
+                cookies = load_file(COOKIES_FILE, is_json=True)
+            except FileNotFoundError:
                 await _get_c411_cookies(context, page)
-            
-            if os.path.exists(cookie_path):
-                with open(cookie_path, 'r') as f:
-                    cookies = json.load(f)
-                    await context.add_cookies(cookies)
-            
-            response = await context.request.get("https://c411.org/api/auth/me")
+                cookies = load_file(COOKIES_FILE, is_json=True)
+
+            await context.add_cookies(cookies)
+            response = await context.request.get(USER_STATS_URL)
             api_data = await response.json() if response.ok else {}
             if not api_data.get("authenticated"):
                 logger.warning("C411: Session expired or missing, logging in...")
                 if await _get_c411_cookies(context, page):
-                    with open(cookie_path, 'r') as f:
-                        cookies = json.load(f)
-                        await context.add_cookies(cookies)
-                    response = await context.request.get("https://c411.org/api/auth/me")
+                    cookies = load_file(COOKIES_FILE, is_json=True)
+                    await context.add_cookies(cookies)
+                    response = await context.request.get(USER_STATS_URL)
                     api_data = await response.json() if response.ok else {}
 
             user_data = api_data.get("user")
