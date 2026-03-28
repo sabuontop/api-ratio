@@ -289,7 +289,7 @@
               }
             ]
           },
-          "unit": "decbytes"
+          "unit": "bytes"
         },
         "overrides": []
       },
@@ -389,7 +389,7 @@
               }
             ]
           },
-          "unit": "decbytes"
+          "unit": "bytes"
         },
         "overrides": []
       },
@@ -484,7 +484,7 @@
   "timezone": "browser",
   "title": "Torrent Trackers Stats",
   "uid": "ky777lx",
-  "version": 2,
+  "version": 3,
   "weekStart": "",
   "id": null
 }
