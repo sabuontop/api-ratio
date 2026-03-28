@@ -1,88 +1,76 @@
-# 🚀 Tracker Ratio API (Torr9 & C411)
+# 🚀 API Ratio Tracker
 
-Une API légère et autonome construite avec **FastAPI** et **Playwright** pour récupérer vos statistiques (ratio, upload, download) sur les trackers privés Torr9 et C411. 
-
-Ce projet est conçu pour être intégré facilement dans des tableaux de bord comme **Glance**, **Homepage** ou **Dashy**.
+Une API robuste et modulaire en **Python (FastAPI)** conçue pour scraper automatiquement vos statistiques (Upload, Download, Ratio) depuis divers trackers privés et les exposer pour vos tableaux de bord (Glance, Dashy, etc.) ou pour du monitoring avec **Prometheus**.
 
 ---
 
-## ✨ Caractéristiques
+## 🌟 Points Forts
 
-- **Connexion Automatisée** : Le script se connecte tout seul à Torr9 et C411 en utilisant vos identifiants. Plus besoin de copier-coller des cookies ou des tokens manuellement !
-- **Gestion des Sessions** : Rafraîchissement automatique des tokens JWT expirés et persistance des cookies.
-- **Mise à jour en Arrière-plan** : Utilise un ordonnanceur (`APScheduler`) pour mettre à jour les données toutes les heures sans ralentir les requêtes API.
-- **Formatage Intelligent** : Les données de taille (Go, To) sont converties automatiquement pour une lecture humaine.
-- **Dashboard Ready** : Sortie JSON propre prête pour n'importe quel widget `custom-api`.
-
----
-
-## 🛠️ Installation
-
-### 1. Prérequis
-Assurez-vous d'avoir Python 3.9+ installé.
-
-```bash
-# Cloner le projet
-git clone https://github.com/sabuontop/api-ratio.git
-cd api-ratio
-
-# Créer et activer l'environnement virtuel
-python -m venv venv
-source venv/bin/activate  # Linux/macOS
-# ou
-.\venv\Scripts\activate  # Windows
-
-# Installer les dépendances
-pip install -r requirements.txt
-
-# Installer les navigateurs Playwright
-playwright install chromium
-```
-
-### 2. Configuration (.env)
-Créez un fichier `.env` à la racine du projet :
-
-```env
-# Torr9
-TORR9_USER="votre_pseudo"
-TORR9_PASSWORD="votre_mot_de_passe"
-
-# C411
-C411_USER="votre_pseudo"
-C411_PASS="votre_mot_de_passe"
-
-# GEMINI-TRACKER
-GEMINI_TOKEN=your_api_token
-```
+- **Automatisé** : Connexion automatique via Playwright pour gérer les sessions et le localStorage.
+- **Modulaire** : Architecture par "scrappers" permettant d'ajouter facilement de nouveaux trackers.
+- **Monitoring natif** : Expose des métriques au format Prometheus sur `/metrics`.
+- **Docker-Ready** : Image optimisée (Slim) pour un déploiement ultra-léger et rapide.
+- **Sécurisé** : Gestion des identifiants via variables d'environnement (`.env`).
 
 ---
 
-## 🚀 Utilisation
+## 🛠️ Trackers Supportés
 
-### Lancer l'API (Serveur)
-```bash
-python api.py
-```
-L'API sera disponible sur `http://<VOTRE_IP>:8679/ratios`.
-
-Un endpoint prometheus est également disponible sur `http://<VOTRE_IP>:8679/metrics`
-
-### Utiliser le script ponctuel
-Pour voir vos stats rapidement dans le terminal :
-```bash
-python scrap_ratio.py --site all
-```
+- [x] **C411** (API Auth / Cloudflare compatible)
+- [x] **Torr9** (LocalStorage Token Auth)
+- [x] **Gemini** (API Key Support)
 
 ---
 
-## 🛡️ Sécurité & Recommandations
+## 🚀 Installation & Déploiement
 
-- **Confidentialité** : Ne partagez jamais votre fichier `.env` ou les fichiers `.json/.txt` générés (cookies/tokens).
-- **Abus** : Le script est configuré pour rafraîchir les données toutes les heures. Ne réduisez pas trop cet intervalle pour éviter d'être banni par les trackers pour "scraping excessif".
-- **Déploiement VPS** : Il est recommandé d'utiliser **PM2** pour garder l'API active en permanence :
-  ```bash
-  pm2 start api.py --name "ratio-api" --interpreter ./venv/bin/python
-  ```
+### Option 1 : Docker Compose (Recommandé)
+
+1. Clonez le dépôt :
+   ```bash
+   git clone https://github.com/sabuontop/api-ratio.git
+   cd api-ratio
+   ```
+
+2. Configurez vos accès dans un fichier `.env` à la racine.
+3. Lancez le service :
+   ```bash
+   docker compose up -d --build
+   ```
+
+### Option 2 : Installation manuelle
+
+1. Installez les dépendances :
+   ```bash
+   pip install -r requirements.txt
+   playwright install chromium --with-deps
+   ```
+
+2. Lancez l'API :
+   ```bash
+   python api.py
+   ```
 
 ---
-*Réalisé avec ❤️ pour la communauté self-hosted.*
+
+## 📊 Endpoints de l'API
+
+- **`GET /ratios`** : Retourne les statistiques formatées (Go/To) et le ratio actuel.
+- **`GET /metrics`** : Métriques au format Prometheus pour Grafana.
+- **`GET /`** : Informations basiques sur l'état de l'API.
+
+---
+
+## ⚙️ Configuration (.env)
+
+| Variable | Description |
+| :--- | :--- |
+| `TORR9_USER` / `PASS` | Vos identifiants pour Torr9 |
+| `C411_USER` / `PASS` | Vos identifiants pour C411 |
+| `GEMINI_TOKEN` | Votre jeton API pour Gemini-Tracker |
+| `REFRESH_INTERVAL_MINUTES` | Fréquence de mise à jour (Défaut: 60 min) |
+
+---
+
+## 👨‍💻 Contribution
+Les Pull Requests sont les bienvenues ! Pour ajouter un tracker, créez simplement un nouveau fichier dans le dossier `scrappers/`.
