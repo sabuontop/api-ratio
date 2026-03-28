@@ -6,7 +6,7 @@ from typing import Dict, Any
 from playwright.async_api import async_playwright, BrowserContext, Page
 from dotenv import load_dotenv
 
-from util import default_user_agent, load_file, write_file, MissingCredentialsError
+from util import default_user_agent, load_file, write_file, MissingCredentialsError, ScrappingError
 
 load_dotenv()
 logger = logging.getLogger()
@@ -58,7 +58,7 @@ async def get_stats(headless: bool = True) -> Dict[str, Any]:
         context = await browser.new_context(user_agent=default_user_agent)
         page = await context.new_page()
         try:
-            res : Dict[str, Any] = {"ratio": "N/A", "upload": "N/A", "download": "N/A"}
+            res : Dict[str, Any] = {"raw_upload": 0, "raw_download": 0}
             try:
                 cookies = load_file(COOKIES_FILE, is_json=True)
             except FileNotFoundError:
@@ -75,6 +75,8 @@ async def get_stats(headless: bool = True) -> Dict[str, Any]:
                     await context.add_cookies(cookies)
                     response = await context.request.get(USER_STATS_URL)
                     api_data = await response.json() if response.ok else {}
+                else:
+                    raise ScrappingError("C411: Failed to authenticate")
 
             user_data = api_data.get("user")
             if user_data:
@@ -84,10 +86,9 @@ async def get_stats(headless: bool = True) -> Dict[str, Any]:
                 res["raw_download"] = dl
 
             return res
-        except MissingCredentialsError as e:
+        except (MissingCredentialsError, ScrappingError) as e:
             raise e
         except Exception as e:
-            logger.error(f"Error : {e}")
-            return {"raw_ratio": "Error", "raw_upload": "N/A", "raw_download": "N/A"}
+            raise ScrappingError(e)
         finally:
             await browser.close()

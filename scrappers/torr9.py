@@ -5,7 +5,7 @@ from typing import Dict, Any, Optional
 from playwright.async_api import async_playwright, Page
 from dotenv import load_dotenv
 
-from util import default_user_agent, load_file, write_file, MissingCredentialsError
+from util import default_user_agent, load_file, write_file, MissingCredentialsError, ScrappingError
 
 load_dotenv()
 logger = logging.getLogger()
@@ -57,7 +57,7 @@ async def get_stats(headless: bool = True) -> Dict[str, Any]:
     context = await browser.new_context(user_agent=default_user_agent)
     page = await context.new_page()
     try:
-        res : Dict[str, Any] = {"ratio": "N/A", "upload": "N/A", "download": "N/A"}
+        res : Dict[str, Any] = {"raw_upload": 0, "raw_download": 0}
         token = None
         try:
             token= load_file(TOKEN_FILE).strip()
@@ -65,7 +65,7 @@ async def get_stats(headless: bool = True) -> Dict[str, Any]:
             token = await _get_torr9_token(page)
         
         if not token:
-            return {"ratio": "No Token", "upload": "N/A", "download": "N/A"}
+            raise MissingCredentialsError("Fauked ")
         
         response = await context.request.get(
             USER_STATS_URL,
@@ -82,7 +82,7 @@ async def get_stats(headless: bool = True) -> Dict[str, Any]:
                 )
         
         if not response.ok:
-            return {"ratio": f"API Error {response.status}", "raw_upload": "N/A", "raw_download": "N/A"}
+            raise ScrappingError(f" Torr9: API Error {response.status}")
         
         api_data = await response.json()
         up = api_data.get("total_uploaded_bytes", 0)
@@ -91,10 +91,9 @@ async def get_stats(headless: bool = True) -> Dict[str, Any]:
         res["raw_download"] = dl
 
         return res
-    except MissingCredentialsError as e:
+    except (MissingCredentialsError, ScrappingError) as e:
         raise e
     except Exception as e:
-        logger.error(f"Error : {e}")
-        return {"ratio": "Error", "raw_upload": "N/A", "raw_download": "N/A"}
+        raise ScrappingError(e)
     finally:
         await browser.close()

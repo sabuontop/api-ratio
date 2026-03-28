@@ -6,7 +6,7 @@ import logging
 from typing import Dict, Any
 from dotenv import load_dotenv
 
-from util import default_user_agent, parse_bytes, MissingCredentialsError
+from util import default_user_agent, parse_bytes, MissingCredentialsError, ScrappingError
 
 load_dotenv()
 logger = logging.getLogger()
@@ -26,21 +26,9 @@ async def get_stats(headless: bool = False) -> Dict[str, Any]:
             with urllib.request.urlopen(req) as response:
                 api_data = json.loads(response.read())
         except urllib.error.HTTPError as e:
-            logger.error(
-                f"Failed to get Gemini stats : HTTP {e.code}, Reason {e.reason}"
-            )
-            return {
-                "ratio": f"API Error {response.status}",
-                "upload": "N/A",
-                "download": "N/A",
-            }
+            raise ScrappingError(f"Failed to get Gemini stats : HTTP {e.code}, Reason {e.reason}")
         except urllib.error.URLError as e:
-            logger.error(f"Failed to get Gemini stats : Error {e.reason}")
-            return {
-                "ratio": f"API Error {response.status}",
-                "upload": "N/A",
-                "download": "N/A",
-            }
+            raise ScrappingError(e)
 
         up = parse_bytes(api_data.get("uploaded", "0"))
         dl = parse_bytes(api_data.get("downloaded", "0"))
@@ -48,8 +36,7 @@ async def get_stats(headless: bool = False) -> Dict[str, Any]:
         res["raw_download"] = dl
 
         return res
-    except MissingCredentialsError as e:
+    except (MissingCredentialsError, ScrappingError) as e:
             raise e
     except Exception as e:
-        logger.error(f"Error : {e}")
-        return {"ratio": "Error", "raw_upload": "N/A", "raw_download": "N/A"}
+        raise ScrappingError(e)
