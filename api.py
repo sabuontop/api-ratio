@@ -44,7 +44,7 @@ async def lifespan(app: FastAPI):
     asyncio.create_task(update_all())
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
-        update_all, "interval", minutes=os.getenv("REFRESH_INTERVAL_MINUTES", 60)
+        update_all, "interval", minutes=int(os.getenv("REFRESH_INTERVAL_MINUTES", 60))
     )
     scheduler.start()
     yield
