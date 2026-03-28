@@ -12,3 +12,4 @@ node_modules/
 # Eviter d'embarquer les cookies locaux s'ils traînent
 c411_cookies.json
 torr9_token.txt
+contrib/
