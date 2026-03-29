@@ -19,6 +19,7 @@ Une API robuste et modulaire en **Python (FastAPI)** conçue pour scraper automa
 - [x] **C411** (API Auth / Auto-Login)
 - [x] **Torr9** (LocalStorage Token / Bonus inclus)
 - [x] **Gemini** (API Key Support)
+- [x] **Generation Free** (API Key Support)
 
 ---
 
@@ -66,6 +67,7 @@ C'est la méthode de déploiement la plus simple et la plus rapide.
 | `TORR9_USER` / `PASS` | Vos identifiants pour Torr9 |
 | `C411_USER` / `PASS` | Vos identifiants pour C411 |
 | `GEMINI_TOKEN` | Votre jeton API pour Gemini-Tracker |
+| `GFREE_TOKEN` | Votre jeton API pour Generation Free |
 | `REFRESH_INTERVAL_MINUTES` | Fréquence de mise à jour (Défaut: 60 min) |
 
 ---
