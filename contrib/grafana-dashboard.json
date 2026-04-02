@@ -364,21 +364,17 @@
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 0,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "text",
-                "value": 0
-              },
-              {
                 "color": "green",
-                "value": 1
+                "value": 0
               }
             ]
-          },
-          "unit": "bytes"
+          }
         },
         "overrides": []
       },
@@ -391,7 +387,7 @@
       "id": 6,
       "options": {
         "colorMode": "value",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "percentChangeColorMode": "standard",
@@ -411,7 +407,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "bonus{instance=~\"$hostname.+\", tracker=~\"$tracker\"}",
+          "expr": "bonus_points{instance=~\"$hostname.+\", tracker=~\"$tracker\"}",
           "instant": true,
           "legendFormat": "{{tracker}}",
           "range": false,
@@ -650,6 +646,104 @@
       ],
       "title": "Upload",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "log": 2,
+              "type": "log"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 19
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "bonus_points{instance=~\"$hostname.+\",  tracker=~\"$tracker\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "{{tracker}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Bonus points over time",
+      "type": "timeseries"
     }
   ],
   "preload": false,
@@ -703,7 +797,7 @@
   "timezone": "browser",
   "title": "Torrent Trackers Stats",
   "uid": "ky777lx",
-  "version": 9,
+  "version": 13,
   "weekStart": "",
   "id": null
 }
