@@ -61,6 +61,7 @@ def format_cache():
             "ratio": ratios_cache[site]["raw_ratio"],
             "upload": format_bytes(ratios_cache[site]["raw_upload"]),
             "download": format_bytes(ratios_cache[site]["raw_download"]),
+            "bonus": ratios_cache[site].get("bonus", 0),
         } for site in ratios_cache
     }
 
