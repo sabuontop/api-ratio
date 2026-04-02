@@ -84,6 +84,7 @@ async def get_stats(headless: bool = True) -> Dict[str, Any]:
                 dl = user_data.get("downloaded", 0)
                 res["raw_upload"] = up
                 res["raw_download"] = dl
+                res["bonus"] = 0 # No bonus system on C411
 
             return res
         except (MissingCredentialsError, ScrappingError) as e:

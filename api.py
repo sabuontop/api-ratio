@@ -36,7 +36,8 @@ async def update_all():
             ratio_gauge.labels(tracker=site).set(ratios_cache[site]["raw_ratio"])
             upload_gauge.labels(tracker=site).set(ratios_cache[site]["raw_upload"])
             download_gauge.labels(tracker=site).set(ratios_cache[site]["raw_download"])
-            bonus_gauge.labels(tracker=site).set(ratios_cache[site].get("bonus", 0))
+            if ratios_cache[site]["bonus"] > 0:
+                bonus_gauge.labels(tracker=site).set(ratios_cache[site]["bonus"])
         except Exception as e:
             logger.error(f"Error while scrapping {site}: {e}")
 
