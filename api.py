@@ -21,6 +21,7 @@ ratios_cache: Dict[str, Any] = {}
 ratio_gauge = Gauge("tracker", "Ratio of upload to download", ["tracker"], unit="ratio")
 upload_gauge = Gauge("upload", "upload", ["tracker"], unit="bytes")
 download_gauge = Gauge("download", "download", ["tracker"], unit="bytes")
+bonus_gauge = Gauge("bonus", "bonus points", ["tracker"], unit="points")
 
 
 async def update_all():
@@ -35,6 +36,7 @@ async def update_all():
             ratio_gauge.labels(tracker=site).set(ratios_cache[site]["raw_ratio"])
             upload_gauge.labels(tracker=site).set(ratios_cache[site]["raw_upload"])
             download_gauge.labels(tracker=site).set(ratios_cache[site]["raw_download"])
+            bonus_gauge.labels(tracker=site).set(ratios_cache[site].get("bonus", 0))
         except Exception as e:
             logger.error(f"Error while scrapping {site}: {e}")
 
