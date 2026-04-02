@@ -6,8 +6,8 @@ WORKDIR /app
 
 # Variable d'environnement pour Playwright (important)
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Installation des dépendances système minimales pour Chromium
 RUN apt-get update && apt-get install -y --no-install-recommends \
