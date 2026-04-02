@@ -94,7 +94,7 @@ async def get_stats(headless: bool = True) -> Dict[str, Any]:
         
         res["raw_upload"] = up
         res["raw_download"] = dl
-        res["raw_ratio"] = up / dl if dl > 0 else 0
+        res["bonus"] = float(api_data.get("jeton_balance", 0))
 
         return res
     except (MissingCredentialsError, ScrappingError) as e:
