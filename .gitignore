@@ -8,6 +8,7 @@ venv/
 # Project specific sensitive files
 .env
 .config
+config/
 *.rar
 
 # IDE

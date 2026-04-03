@@ -5,6 +5,7 @@ import logging
 from typing import Dict, Any
 from playwright.async_api import async_playwright, BrowserContext, Page
 from dotenv import load_dotenv
+import pyotp
 
 from util import default_user_agent, load_file, write_file, MissingCredentialsError, ScrappingError
 
@@ -18,9 +19,10 @@ USER_STATS_URL = "https://c411.org/api/auth/me"
 async def _get_c411_cookies(ctx: BrowserContext, page: Page) -> bool:
     """Automated login to get fresh C411 cookies if missing or expired"""
     user, psw = os.getenv("C411_USER"), os.getenv("C411_PASS")
-    if not (user and psw): 
+    totp_secret = os.getenv("C411_TOTP_SECRET")
+    if not (user and psw):
         raise MissingCredentialsError("Missing C411 Username or Password")
-    
+
 
     try:
         logger.info("C411: Attempting automated login...")
@@ -28,19 +30,35 @@ async def _get_c411_cookies(ctx: BrowserContext, page: Page) -> bool:
         await page.fill('input[placeholder*="Pseudo"]', user)
         await page.fill('input[placeholder*="Mot de passe"]', psw)
         await asyncio.sleep(1)
-        
+
         login_btn = await page.query_selector('button:has-text("Connexion"), button.bg-emerald-500')
         if login_btn:
             await login_btn.click()
         else:
             await page.keyboard.press("Enter")
-        
-        await asyncio.sleep(5) 
-        
+
+        await asyncio.sleep(3)
+
+        # Handle 2FA if a TOTP secret is configured
+        if totp_secret:
+            totp_input = await page.query_selector('input[type="text"][placeholder*="code"], input[autocomplete="one-time-code"], input[name*="otp"], input[name*="2fa"], input[name*="totp"]')
+            if totp_input:
+                logger.info("C411: 2FA field detected, generating TOTP code...")
+                totp = pyotp.TOTP(totp_secret)
+                code = totp.now()
+                await totp_input.fill(code)
+                await asyncio.sleep(1)
+                confirm_btn = await page.query_selector('button[type="submit"], button:has-text("Valider"), button:has-text("Connexion")')
+                if confirm_btn:
+                    await confirm_btn.click()
+                else:
+                    await page.keyboard.press("Enter")
+                await asyncio.sleep(3)
+
         await page.goto(USER_STATS_URL)
         content = await page.inner_text("body")
         api_data = json.loads(content)
-        
+
         if api_data.get("authenticated"):
             cookies = await ctx.cookies()
             write_file(COOKIES_FILE, json.dumps(cookies))

@@ -7,3 +7,4 @@ playwright-stealth
 prometheus_client
 httpx
 aiohttp
+pyotp
