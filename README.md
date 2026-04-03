@@ -31,7 +31,7 @@ C'est la méthode de déploiement la plus simple et la plus rapide.
    ```yaml
    services:
      scrap-ratio:
-       image: ghcr.io/sabuontop/api-ratio:latest # ou sabuontop/api-ratio:latest
+       image: sabuontop/api-ratio:latest # ou ghcr.io/sabuontop/api-ratio:latest
        container_name: scrap-ratio-api
        restart: always
        ports:
