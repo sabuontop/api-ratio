@@ -45,6 +45,8 @@ def parse_bytes(size_str: str) -> float:
     }
     parts = size_str.strip().split()
     value = float(parts[0])
+    if len(parts) < 2:
+        return value
     unit = parts[1].upper()
     return value * units.get(unit, 1)
 
