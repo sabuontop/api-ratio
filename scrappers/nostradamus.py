@@ -3,30 +3,15 @@ import os
 import re
 from typing import Any, Dict, Optional
 
-from dotenv import load_dotenv
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 
 from util import MissingCredentialsError, ScrappingError, parse_bytes
 
-load_dotenv()
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://nostradamus.foo"
 SIGNIN_URL = f"{BASE_URL}/sign-in"
 SETTINGS_URL = f"{BASE_URL}/settings"
-DEBUG_NOSTRADAMUS = os.getenv("DEBUG_NOSTRADAMUS", "0") == "1"
-
-
-async def _dump_debug(page, name: str) -> None:
-    if not DEBUG_NOSTRADAMUS:
-        return
-    try:
-        html = await page.content()
-        with open(f"/tmp/{name}.html", "w", encoding="utf-8") as f:
-            f.write(html)
-        logger.warning("Nostradamus debug HTML written to /tmp/%s.html", name)
-    except Exception as e:
-        logger.warning("Failed to write debug dump %s: %s", name, e)
 
 
 def _clean_text(value: Optional[str]) -> Optional[str]:
@@ -105,7 +90,6 @@ async def _wait_for_real_signin(page) -> None:
         except Exception:
             pass
 
-    await _dump_debug(page, "nostradamus_signin_blocked")
     raise ScrappingError("Nostradamus: anti-bot challenge did not clear")
 
 
@@ -142,9 +126,7 @@ async def _extract_stats_with_locators(page) -> Dict[str, Any]:
         pass
 
     merged = " ".join(_clean_text(t) or "" for t in texts if t)
-    stats = _parse_stats_from_text(merged)
-
-    return stats
+    return _parse_stats_from_text(merged)
 
 
 async def _login_and_fetch(page, private_key: str) -> Dict[str, Any]:
@@ -182,16 +164,13 @@ async def _login_and_fetch(page, private_key: str) -> Dict[str, Any]:
             error_text = await page.locator("body").text_content()
         except Exception:
             error_text = ""
-        await _dump_debug(page, "nostradamus_login_failed")
         raise ScrappingError(
-            f"Nostradamus: login failed, still on sign-in page. "
+            "Nostradamus: login failed, still on sign-in page. "
             f"Page text preview: {(error_text or '')[:400]}"
         )
 
     await page.goto(SETTINGS_URL, wait_until="domcontentloaded", timeout=30000)
     await page.wait_for_timeout(3000)
-
-    await _dump_debug(page, "nostradamus_settings_after_login")
 
     html = await page.content()
     if "Making sure you&#39;re not a bot!" in html:
@@ -222,7 +201,7 @@ async def get_stats(headless: bool = True) -> Dict[str, Any]:
 
     if not private_key:
         raise MissingCredentialsError(
-            "Missing NOSTRADAMUS_PRIVATE_KEY (or NOSTRADAMUS_API_KEY) in .env"
+            "Missing NOSTRADAMUS_PRIVATE_KEY (or NOSTRADAMUS_API_KEY) in environment"
         )
 
     try:
