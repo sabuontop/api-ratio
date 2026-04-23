@@ -4,6 +4,9 @@ fastapi
 uvicorn
 apscheduler
 playwright-stealth
+playwright
+bs4
+requests
 prometheus_client
 httpx
 aiohttp
