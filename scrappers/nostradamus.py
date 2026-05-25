@@ -128,34 +128,42 @@ async def _extract_stats_with_locators(page) -> Dict[str, Any]:
     merged = " ".join(_clean_text(t) or "" for t in texts if t)
     return _parse_stats_from_text(merged)
 
-
 async def _login_and_fetch(page, private_key: str) -> Dict[str, Any]:
     await _wait_for_real_signin(page)
 
     key_input = page.locator("#private-key-input")
-    await key_input.wait_for(timeout=15000)
+    await key_input.wait_for(state="visible", timeout=15000)
 
     await key_input.click()
-    await key_input.fill("")
-    await key_input.type(private_key, delay=35)
-
+    await key_input.press("Control+A")
+    await key_input.type(private_key, delay=50)
     await key_input.dispatch_event("input")
     await key_input.dispatch_event("change")
-
     await page.wait_for_timeout(500)
 
-    login_button = page.locator('button[phx-click="start_login"]')
-    await login_button.wait_for(timeout=10000)
-
-    await key_input.press("Enter")
-    await page.wait_for_timeout(1500)
-
-    if "/sign-in" in page.url:
-        await login_button.click()
-        await page.wait_for_timeout(3000)
+    login_button = page.get_by_role("button", name=re.compile(r"Se connecter", re.I))
 
     try:
-        await page.wait_for_url(re.compile(r"^https://nostradamus\.foo/(?!sign-in).*$"), timeout=15000)
+        await login_button.wait_for(state="visible", timeout=10000)
+    except PlaywrightTimeoutError:
+        login_button = page.locator('button[type="submit"]')
+
+    await key_input.press("Enter")
+    await page.wait_for_timeout(2000)
+
+    if "/sign-in" in page.url:
+        try:
+            if await login_button.is_visible():
+                await login_button.click()
+                await page.wait_for_timeout(2500)
+        except Exception:
+            pass
+
+    try:
+        await page.wait_for_url(
+            re.compile(r"^https://nostradamus\.foo/(?!sign-in).*$"),
+            timeout=20000,
+        )
     except PlaywrightTimeoutError:
         pass
 
@@ -190,7 +198,6 @@ async def _login_and_fetch(page, private_key: str) -> Dict[str, Any]:
         raise ScrappingError("Nostradamus: stats block not found on settings page")
 
     return stats
-
 
 async def get_stats(headless: bool = True) -> Dict[str, Any]:
     private_key = (
