@@ -16,14 +16,16 @@ Une API robuste et modulaire en **Python (FastAPI)** conçue pour scraper automa
 
 ## 🛠️ Trackers Supportés
 
-- [x] **C411** (API Auth / Auto-Login)
-- [x] **Torr9** (LocalStorage Token / Bonus inclus)
-- [x] **Gemini** (API Key Support)
-- [x] **Generation Free** (API Key Support)
-- [X] **Crazyspirits.py** (Creditentials)
+- [X] **C411** (API Auth / Auto-Login)
+- [X] **Torr9** (LocalStorage Token / Bonus inclus)
+- [X] **Gemini** (API Key Support)
+- [X] **Generation Free** (API Key Support)
+- [X] **Crazy Spirits** (Credentials)
 - [X] **Nostradamus** (Private key)
 - [X] **TheOldSchool** (API TOKEN)
 - [X] **La Cale** (Credentials)
+- [X] **Redacted** (API TOKEN)
+- [X] **HD-Space** (Credentials)
 
 ---
 
@@ -70,8 +72,14 @@ C'est la méthode de déploiement la plus simple et la plus rapide.
 | :--- | :--- |
 | `TORR9_USER` / `PASS` | Vos identifiants pour Torr9 |
 | `C411_USER` / `PASS` | Vos identifiants pour C411 |
+| `LACALE_USER` / `PASS` | Vos identifiants pour La Cale |
 | `GEMINI_TOKEN` | Votre jeton API pour Gemini-Tracker |
+| `TOS_TOKEN` | Votre jeton API pour The Old School |
 | `GFREE_TOKEN` | Votre jeton API pour Generation Free |
+| `RED_APIKEY` | Votre jeton API pour Redacted |
+| `HDSPACE_COOKIE` | Vos cookies 'pass' et 'uid' HD-Space |
+| `CRAZYSPIRITS_COOKIE` | Vos cookies 'pass' et 'uid' CrazySpirits |
+| `NOSTRADAMUS_PRIVATE_KEY` | Votre jeton API pour Nostradamus |
 | `REFRESH_INTERVAL_MINUTES` | Fréquence de mise à jour (Défaut: 60 min) |
 
 ---
