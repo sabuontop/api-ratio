@@ -26,6 +26,7 @@ Une API robuste et modulaire en **Python (FastAPI)** conçue pour scraper automa
 - [X] **La Cale** (Credentials)
 - [X] **Redacted** (API TOKEN)
 - [X] **HD-Space** (Credentials)
+- [X] **NEXUM** (API KEY)
 
 ---
 
