@@ -1,7 +1,6 @@
 services:
   scrap-ratio:
-    image: sabuontop/api-ratio:test
-    # build: .
+    image: sabuontop/api-ratio:latest
     container_name: scrap-ratio-api
     restart: always
     ports:
