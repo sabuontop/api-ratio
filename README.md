@@ -14,7 +14,6 @@ API Python (FastAPI) permettant de récupérer automatiquement vos statistiques 
 - **Nostradamus**
 - **Redacted**
 - **The Old School**
-- **Torr9**
 - **TR4KER**
 
 ## Déploiement Docker
@@ -54,7 +53,6 @@ docker compose up -d
 | :--- | :--- |
 | `TR4KER_TOKEN` | Clé API TR4KER |
 | `TR4KER_USER` / `TR4KER_PASS` | Identifiants TR4KER (alternative au token) |
-| `TORR9_USER` / `TORR9_PASSWORD` | Identifiants Torr9 |
 | `C411_USER` / `C411_PASS` | Identifiants C411 |
 | `LACALE_USER` / `LACALE_PASS` | Identifiants La Cale |
 | `GEMINI_TOKEN` | Jeton API Gemini |
