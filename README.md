@@ -52,7 +52,6 @@ docker compose up -d
 | Variable | Description |
 | :--- | :--- |
 | `TR4KER_TOKEN` | Clé API TR4KER |
-| `TR4KER_USER` / `TR4KER_PASS` | Identifiants TR4KER (alternative au token) |
 | `C411_USER` / `C411_PASS` | Identifiants C411 |
 | `LACALE_USER` / `LACALE_PASS` | Identifiants La Cale |
 | `GEMINI_TOKEN` | Jeton API Gemini |
