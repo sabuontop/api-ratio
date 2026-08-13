@@ -10,6 +10,7 @@ API Python (FastAPI) permettant de récupérer automatiquement vos statistiques 
 - **Generation Free**
 - **HD-Space**
 - **La Cale**
+- **Memphis**
 - **NEXUM**
 - **Nostradamus**
 - **Redacted**
@@ -52,6 +53,7 @@ docker compose up -d
 | Variable | Description |
 | :--- | :--- |
 | `TR4KER_TOKEN` | Clé API TR4KER |
+| `MEMPHIS_USER` / `MEMPHIS_PASS` | Identifiants Memphis |
 | `C411_USER` / `C411_PASS` | Identifiants C411 |
 | `LACALE_USER` / `LACALE_PASS` | Identifiants La Cale |
 | `GEMINI_TOKEN` | Jeton API Gemini |
