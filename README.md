@@ -16,7 +16,6 @@ API Python (FastAPI) permettant de récupérer automatiquement vos statistiques 
 - **Redacted**
 - **The Old School**
 - **TR4KER**
-- **YGG Reborn**
 
 ## Déploiement Docker
 
@@ -46,7 +45,7 @@ docker compose up -d
 ## Endpoints
 
 - `GET /ratios` : Données formatées en JSON (ratio, upload, download, bonus).
-- `GET /metrics` : Exposition Prometheus pour vos dashboards (Grafana, etc.).
+- `GET /metrics` : Exposition Prometheus pour vos dashboards.
 - `GET /` : Statut du service.
 
 ## Configuration (.env)
@@ -54,8 +53,6 @@ docker compose up -d
 | Variable | Description |
 | :--- | :--- |
 | `TR4KER_TOKEN` | Clé API TR4KER |
-| `YGGREBORN_COOKIE` | Cookies de session YGG Reborn (`__ygg_sess=...; cf_clearance=...`) |
-| `YGGREBORN_USER_AGENT` | User-Agent exact de votre navigateur (requis pour valider `cf_clearance`) |
 | `MEMPHIS_USER` / `MEMPHIS_PASS` | Identifiants Memphis |
 | `C411_USER` / `C411_PASS` | Identifiants C411 |
 | `LACALE_USER` / `LACALE_PASS` | Identifiants La Cale |
@@ -68,11 +65,3 @@ docker compose up -d
 | `CRAZYSPIRITS_COOKIE` | Cookies CrazySpirits (`uid=...; pass=...`) |
 | `NOSTRADAMUS_PRIVATE_KEY` | Clé privée Nostradamus |
 | `REFRESH_INTERVAL_MINUTES` | Intervalle de rafraîchissement en minutes (Défaut: 60) |
-
-### Note sur les trackers à cookies (YGG Reborn, CrazySpirits, HD-Space)
-
-Certains trackers utilisent des protections anti-bot (Cloudflare Turnstile) ou n'exposent pas d'API ratio publique. Pour ces sites :
-1. Connectez-vous sur le site via votre navigateur.
-2. Copiez les cookies de session via les outils de développement (F12 -> Application -> Cookies).
-3. Renseignez la variable `_COOKIE` dans votre `.env`.
-4. Pour YGG Reborn, ajoutez aussi `YGGREBORN_USER_AGENT` avec la valeur de `navigator.userAgent` de votre navigateur.
