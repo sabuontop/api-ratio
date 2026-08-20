@@ -42,6 +42,12 @@ def parse_bytes(size_str: str) -> float:
         "TIB": 1024**4,
         "PIB": 1024**5,
         "EIB": 1024**6,
+        "KO": 1024,
+        "MO": 1024**2,
+        "GO": 1024**3,
+        "TO": 1024**4,
+        "PO": 1024**5,
+        "EO": 1024**6,
     }
     parts = size_str.strip().split()
     value = float(parts[0])
